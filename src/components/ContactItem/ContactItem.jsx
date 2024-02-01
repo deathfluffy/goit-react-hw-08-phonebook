@@ -1,13 +1,18 @@
 import css from './ContactItem.module.css';
 import { useDispatch } from 'react-redux';
-import { deleteContacts } from '../../redux/Services/Api'; 
+import { apiRemoveContact } from '../../redux/Contact/ContactsSlice'; 
+import { toast } from 'react-toastify';
 
 export default function ContactItem({ contact }) {
-  const { id, name, number } = contact;
+  const { name, number } = contact;
   const dispatch = useDispatch();
 
   const handleRemoveContact = () => {
-    dispatch(deleteContacts(id));
+    dispatch(apiRemoveContact(contact.Id))
+        .unwrap()
+        .then(data => {
+          toast.success(`${data.name} was successfully deleted!`);
+        });
   };
 
   return (

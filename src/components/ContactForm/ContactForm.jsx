@@ -1,7 +1,7 @@
 import { nanoid } from '@reduxjs/toolkit';
 import css from './ContactForm.module.css';
 import { useSelector, useDispatch } from 'react-redux';
-import {  addContacts } from '../../redux/Services/Api';
+import {  apiAddContact } from '../../redux/Contact/ContactsSlice';
 import { selectContactsAll } from '../../redux/selectors';
 import { useState } from 'react';
 
@@ -40,12 +40,12 @@ export default function ContactForm() {
     }
 
     const contact = { id: nanoid(), name, number };
-    dispatch(addContacts(contact));
+    dispatch(apiAddContact(contact));
     setFormData({ name: '', number: '' });
   };
   const onFormSubmit = (formData) => {
     const contact = { id: nanoid(), ...formData };
-    dispatch(addContacts(contact));
+    dispatch(apiAddContact(contact));
   };
   return (
     <div className={css.formContainer}>

@@ -31,7 +31,7 @@ const RegisterPage = () => {
           <input
             type="text"
             name="userName"
-            placeholder="Kirito"
+            placeholder="Name"
             minLength={2}
             required
           />
@@ -41,7 +41,7 @@ const RegisterPage = () => {
           <input
             type="email"
             name="userEmail"
-            placeholder="kirito228@hotmail.ua"
+            placeholder="example@gmail.com"
             required
           />
         </label>

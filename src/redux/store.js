@@ -1,5 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
+
 import {
+  persistStore,
+  persistReducer,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -7,9 +10,13 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+
+
 import { contactsReducer } from './Contact/ContactsSlice';
 import { filterReducer } from './ContactFilter/ContactFilter';
 import { authReducer } from './auth/authSlice';
+
 
 const authConfig = {
   key: 'auth',
@@ -32,3 +39,4 @@ export const store = configureStore({
       },
     }),
 });
+export const persistor = persistStore(store);
