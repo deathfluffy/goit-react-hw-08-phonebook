@@ -1,12 +1,10 @@
 import {
-  selectContacts,
   selectError,
   selectIsLoading,
 } from '../redux/selectors';
 import {
   apiAddContact,
   apiGetContacts,
-  apiRemoveContact,
 } from '../redux/Contact/ContactsSlice';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,9 +14,12 @@ import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import Message from 'components/Message/Message';
 import Loader from 'components/Loader/Loader';
+import ContactFilter from 'components/ContactFilter/ContactFilter';
+import ContactList from 'components/ContactList/ContactList';
+
 const ContactsPage = () => {
     const dispatch = useDispatch();
-    const contacts = useSelector(selectContacts);
+
     const isLoading = useSelector(selectIsLoading);
     const error = useSelector(selectError);
   
@@ -26,13 +27,6 @@ const ContactsPage = () => {
       dispatch(apiGetContacts());
     }, [dispatch]);
   
-    const onDeleteContact = contacId => {
-      dispatch(apiRemoveContact(contacId))
-        .unwrap()
-        .then(data => {
-          toast.success(`${data.name} was successfully deleted!`);
-        });
-    };
   
     const onSubmit = evt => {
       evt.preventDefault();
@@ -80,19 +74,9 @@ const ContactsPage = () => {
           <br />
           <button type="submit">Add contact</button>
         </form>
+        <ContactFilter />
         <ul>
-          {Array.isArray(contacts) &&
-            contacts.map(({ id, name, number }) => {
-              return (
-                <li key={id}>
-                  <h3>{name}</h3>
-                  <p>{number}</p>
-                  <button onClick={() => onDeleteContact(id)} type="button">
-                    ❌
-                  </button>
-                </li>
-              );
-            })}
+          <ContactList />
         </ul>
       </div>
     );
