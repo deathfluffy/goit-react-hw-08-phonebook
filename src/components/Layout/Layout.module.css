@@ -1,0 +1,8 @@
+.mainHeader{
+   display: flex;
+   align-items: center;
+}
+.loader{
+    display: flex;
+    justify-content: center;
+}

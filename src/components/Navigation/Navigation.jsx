@@ -1,57 +1,122 @@
-import React from 'react';
+import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import PhoneIcon from '@mui/icons-material/Phone';
 import { selectAuthIsLoggedIn } from '../../redux/selectors';
-import css from '../App.module.css';
+import UserMenu from '../UserMenu/UserMenu';
 
-const Navigation = () => {
+const pages = [
+  { label: 'Home', path: '/home' },
+  { label: 'Contacts', path: '/contacts' }, 
+  { label: 'Login', path: '/login' },
+  { label: 'Register', path: '/register' }
+];
+
+function Navigation() {
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
   const isLoggedIn = useSelector(selectAuthIsLoggedIn);
 
-  return (
-    <div>
-      <NavLink
-        className={({ isActive }) =>
-          `${css.navLink} ${isActive ? css.active : ''}`
-        }
-        to="/"
-      >
-        Home
-      </NavLink>
-      {isLoggedIn ? (
-        <>
-          <NavLink
-            className={({ isActive }) =>
-              `${css.navLink} ${isActive ? css.active : ''}`
-            }
-            to="/contacts"
-          >
-            Contacts
-          </NavLink>
-        </>
-      ) : (
-        <>
-          <NavLink
-            className={({ isActive }) =>
-              `${css.navLink} ${isActive ? css.active : ''}`
-            }
-            to="/register"
-          >
-            Register
-          </NavLink>
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
 
-          <NavLink
-            className={({ isActive }) =>
-              `${css.navLink} ${isActive ? css.active : ''}`
-            }
-            to="/login"
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  return (
+    <AppBar position="static">
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <PhoneIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <Typography
+            variant="h6"
+            noWrap
+            component={NavLink}
+            to="/home"
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
           >
-            Login
-          </NavLink>
-        </>
-      )}
-    </div>
+            PhoneBook
+          </Typography>
+
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              sx={{
+                display: { xs: 'block', md: 'none' },
+              }}
+            >
+              {pages.map((page) => (
+                ((isLoggedIn && page.label !== 'Login' && page.label !== 'Register') || (!isLoggedIn && page.label !== 'Contacts')) && (
+                  <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                    <NavLink to={page.path} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <Typography textAlign="center">{page.label}</Typography>
+                    </NavLink>
+                  </MenuItem>
+                )
+              ))}
+            </Menu>
+          </Box>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            {pages.map((page) => (
+              ((isLoggedIn && page.label !== 'Login' && page.label !== 'Register') || (!isLoggedIn && page.label !== 'Contacts')) && (
+                <Button
+                  key={page.label}
+                  component={NavLink}
+                  to={page.path}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  {page.label}
+                </Button>
+              )
+            ))}
+          </Box>
+          {isLoggedIn && <UserMenu />}
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
-};
+}
 
 export default Navigation;

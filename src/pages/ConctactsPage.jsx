@@ -1,84 +1,19 @@
-import {
-  selectError,
-  selectIsLoading,
-} from '../redux/selectors';
-import {
-  apiAddContact,
-  apiGetContacts,
-} from '../redux/Contact/ContactsSlice';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import css from '../components/App.module.css'
-import { toast } from 'react-toastify';
-import { useEffect } from 'react';
-import Message from 'components/Message/Message';
-import Loader from 'components/Loader/Loader';
 import ContactFilter from 'components/ContactFilter/ContactFilter';
+import ContactForm from 'components/ContactForm/ContactForm';
 import ContactList from 'components/ContactList/ContactList';
 
-const ContactsPage = () => {
-    const dispatch = useDispatch();
 
-    const isLoading = useSelector(selectIsLoading);
-    const error = useSelector(selectError);
-  
-    useEffect(() => {
-      dispatch(apiGetContacts());
-    }, [dispatch]);
-  
-  
-    const onSubmit = evt => {
-      evt.preventDefault();
-      const name = evt.currentTarget.elements.contactName.value;
-      const number = evt.currentTarget.elements.contactNumber.value;
-  
-      const formData = {
-        name,
-        number,
-      };
-  
-      dispatch(apiAddContact(formData))
-        .unwrap()
-        .then(() => {
-          toast.success('Contact was successfully added!');
-        });
-    };
-    return (
-        <div>
-        ContactsPage
-        {isLoading && <Loader className={css.loader} />}
-        {error && <Message error={error} />}
-        <form onSubmit={onSubmit}>
-          <label>
-            <span>Name:</span>
-            <br />
-            <input
-              type="text"
-              name="contactName"
-              placeholder="John Doe"
-              required
-            />
-          </label>{' '}
-          <br />
-          <label>
-            <span>Number:</span>
-            <br />
-            <input
-              type="text"
-              name="contactNumber"
-              placeholder="+380635661285"
-              required
-            />
-          </label>{' '}
-          <br />
-          <button type="submit">Add contact</button>
-        </form>
-        <ContactFilter />
-        <ul>
-          <ContactList />
-        </ul>
-      </div>
-    );
-  }
-  export default ContactsPage;
+const ContactsPage = () => {
+ 
+  return (
+    <div>
+      <ContactForm />
+      <ContactFilter />
+      <ul>
+        <ContactList />
+      </ul>
+    </div>
+  );
+};
+export default ContactsPage;
