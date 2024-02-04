@@ -1,22 +1,17 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-
-import { selectAuthIsLoggedIn } from '../../redux/selectors';
-import UserMenu from 'components/UserMenu/UserMenu';
 import Navigation from 'components/Navigation/Navigation';
+import css from './Layout.module.css'
 
 
 export default function Layout ({ children }) {
-  const isLoggedIn = useSelector(selectAuthIsLoggedIn)
-
   return (
     <div>
-      <header style={{ display: 'flex', alignItems: 'center' }}>
+      <header className={css.mainHeader}>
         <Navigation />
-        {isLoggedIn && <UserMenu />}
       </header>
-
-      <main>{children}</main>
+      <main>
+        {children}
+        </main>
     </div>
   );
 };

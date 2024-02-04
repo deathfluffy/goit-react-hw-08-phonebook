@@ -1,92 +1,126 @@
-import { nanoid } from '@reduxjs/toolkit';
-import css from './ContactForm.module.css';
-import { useSelector, useDispatch } from 'react-redux';
-import {  apiAddContact } from '../../redux/Contact/ContactsSlice';
-import { selectContactsAll } from '../../redux/selectors';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  TextField,
+  Tooltip,
+  Typography,
+  createTheme,
+} from '@mui/material';
+import { ThemeProvider } from 'styled-components';
+import { useDispatch } from 'react-redux';
+import LocalPhoneRoundedIcon from '@mui/icons-material/LocalPhoneRounded';
+import {
+  apiAddContact,
+  apiGetContacts,
+} from '../../redux/Contact/ContactsSlice';
+import { toast } from 'react-toastify';
 
 export default function ContactForm() {
-  const contacts = useSelector(selectContactsAll);
+  const defaultTheme = createTheme();
   const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     name: '',
-    number: '',
+    phone: '',
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  useEffect(() => {
+    dispatch(apiGetContacts());
+  }, [dispatch]);
+
+  const onSubmit = evt => {
+    evt.preventDefault();
+
+    const { name, phone } = formData;
+
+    const contactData = {
+      name,
+      number: phone,
+    };
+
+    dispatch(apiAddContact(contactData))
+      .unwrap()
+      .then(() => {
+        toast.success('Contact was successfully added!');
+        setFormData({ name: '', phone: '' });
+      })
+      .catch(error => {
+        toast.error('Failed to add contact: ' + error.message);
+      });
   };
 
-  const isFormValid = () => {
-    return formData.name.trim() !== '' && formData.number.trim() !== '';
+  const handleInputChange = event => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleAddContact = () => {
-    const { name, number } = formData;
-
-    if (!contacts) {
-      console.error("Contacts are not defined.");
-      return;
-    }
-
-    const nameInContacts = contacts.find(
-      (contact) => contact.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (nameInContacts) {
-      alert(`${name} is already in contacts`);
-      return;
-    }
-
-    const contact = { id: nanoid(), name, number };
-    dispatch(apiAddContact(contact));
-    setFormData({ name: '', number: '' });
-  };
-  const onFormSubmit = (formData) => {
-    const contact = { id: nanoid(), ...formData };
-    dispatch(apiAddContact(contact));
-  };
   return (
-    <div className={css.formContainer}>
-      <form className={css.MainForm} onSubmit={onFormSubmit} autoComplete="off">
-        <div>
-          <span className={css.FormLabel} htmlFor="name">
-            Name
-          </span>
-          <div>
-            <input
-              className={css.InputField}
-              type="text"
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LocalPhoneRoundedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            PhoneBook
+          </Typography>
+          <form onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="Name"
               name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-              required
-              onChange={handleInputChange}
+              autoComplete="name"
+              autoFocus
+              placeholder="Joe Doe"
+              inputProps={{ maxLength: 20 }}
               value={formData.name}
-            />
-          </div>
-        </div>
-        <div>
-          <span className={css.FormLabel} htmlFor="number">
-            Number
-          </span>
-          <div>
-            <input
-              type="tel"
-              name="number"
-              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-              required
               onChange={handleInputChange}
-              value={formData.number}
             />
-          </div>
-        </div>
-        <button className={css.addButton} type="button" onClick={handleAddContact} disabled={!isFormValid()}>
-          Add contact
-        </button>
-      </form>
-    </div>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="phone"
+              label="Number"
+              type="tel"
+              id="phone"
+              autoComplete="phone"
+              placeholder="+380983789924"
+              inputProps={{ maxLength: 13 }}
+              value={formData.phone}
+              onChange={handleInputChange}
+            />
+            <Tooltip title="Add Contact">
+              <span>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={!formData.name || !formData.phone}
+                >
+                  Add Contact
+                </Button>
+              </span>
+            </Tooltip>
+          </form>
+        </Box>
+      </Container>
+    </ThemeProvider>
   );
 }
