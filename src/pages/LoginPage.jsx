@@ -1,10 +1,7 @@
-import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,39 +10,51 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
-import { apiLoginUser } from '../redux/auth/authSlice';
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="#">
-        PhoneBook
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import {  useRef, useState } from 'react';
+import { apiLoginUser } from '../../src/redux/auth/authSlice';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
 
-
-
-const defaultTheme = createTheme();
-
-export default function LoginPage() {
+function LoginPage() {
+  const defaultTheme = createTheme();
   const dispatch = useDispatch();
+  const formRef = useRef(null);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(formRef.current);
     const email = formData.get('email');
     const password = formData.get('password');
+
+    if (!email || !email.trim()) {
+      setEmailError('Email is required');
+      return;
+    } else {
+      setEmailError('');
+    }
+
   
-    const data = {
-      email,
-      password,
-    };
-  
-    dispatch(apiLoginUser(data));
+    if (!password || password.length < 7) {
+      setPasswordError('Password is required and should be at least 7 symbols long');
+      return;
+    } else {
+      setPasswordError('');
+    }
+
+    dispatch(apiLoginUser({ email, password })).then(response => {
+      if (response.error) {
+        if (response.payload.message === 'User already registered') {
+          toast.error('Failed to login. Your account is already registered.');
+        } else {
+          toast.error('Failed to login. Your account is already registered or entered incorrectly password and email');
+        }
+        console.clear();
+      }
+    });
   };
 
   return (
@@ -64,10 +73,18 @@ export default function LoginPage() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-             Sign In
+            Sign In
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            ref={formRef}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
+              type="email"
+              error={!!emailError}
               margin="normal"
               required
               fullWidth
@@ -76,9 +93,13 @@ export default function LoginPage() {
               name="email"
               autoComplete="email"
               autoFocus
-              placeholder="example@gmail.com"          
+              placeholder="example@gmail.com"
+              helperText={emailError}
             />
-            <TextField            
+           
+
+            <TextField
+              error={!!passwordError}
               margin="normal"
               required
               fullWidth
@@ -89,11 +110,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               placeholder="*******"
               inputProps={{ maxLength: 7 }}
-              helperText="Please enter only 7 symbols"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              helperText={passwordError || 'Please enter only 7 symbols'}
             />
             <Button
               type="submit"
@@ -103,6 +120,7 @@ export default function LoginPage() {
             >
               Sign In
             </Button>
+
             <Grid container>
               <Grid item>
                 <Link href="./register" variant="body2">
@@ -112,15 +130,9 @@ export default function LoginPage() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
 }
 
-
-
-
-
-
-
+export default LoginPage;
