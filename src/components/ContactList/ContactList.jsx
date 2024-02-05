@@ -8,7 +8,7 @@ export default function ContactList() {
 
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center'}}>
+    <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
         {contacts.map(contact => (
           <ContactItem key={contact.id} contact={contact} />
         ))}     
